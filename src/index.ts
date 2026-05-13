@@ -17,7 +17,9 @@ const port = process.env.PORT;
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
+app.options("*", cors());
 app.use(cookieParser())
 app.use(express.json());
 
