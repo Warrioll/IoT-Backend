@@ -22,7 +22,7 @@ try{
         res.cookie('auth', token, {
             httpOnly: true,  
             secure: true,     
-            sameSite: 'strict',
+            sameSite: 'none',
             maxAge: expireTime * 60*60*1000  
         })
      res.sendStatus(201);
