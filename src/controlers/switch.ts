@@ -1,16 +1,21 @@
 import { mqttClient } from "../mqttClient"
 import { Request, Response } from 'express';
+import { verifyAccess } from "./auth";
 
 export const switchToggle = (req: Request, res: Response)=>{
-     const { action} = req.params;
-     if(action==='OFF'){
-        mqttClient.publish('kn/switch', "OFF");
+   verifyAccess(req, res, ()=>{
+      const { id} = req.params;
+      const {mode} = req.body;
+     if(mode==='OFF'){
+        mqttClient.publish(`kn/switch/${id.toString()}`, "OFF");
         res.sendStatus(200);
-     }else if(action==='ON'){
-        mqttClient.publish('kn/switch', "ON");
+     }else if(mode==='ON'){
+        mqttClient.publish(`kn/switch/${id.toString()}`, "ON");
         res.sendStatus(200);
      } else{
         res.sendStatus(422);
      }
+   })
+     
     
 }
