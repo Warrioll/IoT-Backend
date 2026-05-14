@@ -3,34 +3,51 @@ import 'dotenv/config';
 import auth from 'express-basic-auth';
 import { Request, Response } from 'express';
 import { mqttClient } from "./mqttClient";
-import { switchToggle } from "./controlers/switch";
+import { switchToggle } from "./controlers/switchController";
 import { logIn, checkIfLoggedIn } from "./controlers/auth";
 import cookieParser from 'cookie-parser'
 import cors from "cors";
+import mongoose from "mongoose";
 
 
 
 
 const app = express();
-const port = process.env.PORT;
-
+const PORT = process.env.PORT;
+const DBURL = process.env.DB_URL as string;
+ 
+ 
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 }));
 app.use(cookieParser())
 app.use(express.json());
 
+ 
 
 
- const pass = process.env.APP_PASS as string;
-   const username = process.env.APP_USERNAME as string;
+const connectToDatabase = async () =>{
+    for(let i=0; i<10 ; i++){
+        try{
+             console.log('Trying to connect to database... ')
+              mongoose.connection.on('error', (error: Error)=> console.log(error));
+            await mongoose.connect(DBURL, {tls: true});
+            
+           
+            console.log('Connected to database successfully')
+            return
+             
+        }catch(e){
+            console.log('Connection to database failed: ', e)
+            await new Promise(resume => setTimeout(resume, 5000));
+        }
 
-// app.use(auth({
-//     users: { [username]: pass },
-//     challenge: true
-// }));
+          
+    }
+    throw new Error('Cannot establish connection to database!')
+}
 
 app.get("/", (req, res) => {
   mqttClient.publish('my/test/topic', 'TEST!');
@@ -42,6 +59,6 @@ app.post('/login',logIn);
 app.put("/switch/:id",switchToggle);
 app.get('/isLoggedIn',checkIfLoggedIn );
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
-}); 
+connectToDatabase().then(()=>{
+    app.listen(PORT, ()=> console.log("Listening on port ", PORT))
+})

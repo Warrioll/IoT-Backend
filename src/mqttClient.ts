@@ -1,5 +1,6 @@
 import mqtt from "mqtt";
 import 'dotenv/config';
+import { postPowerUsageData } from "./controlers/powerUsageController";
 
 let options = {
     host: process.env.BROKER_URL,
@@ -26,10 +27,15 @@ client.on('error', function (error) {
 client.on('message', function (topic, message) {
     // called each time a message is received
     console.log('Received message:', topic, message.toString());
+    if(topic==='kn/powerUsage'){
+        console.log(message.toString());
+        postPowerUsageData(Number(message.toString()))
+    }
 });
 
 // subscribe to topic 'my/test/topic'
 client.subscribe('my/test/topic');
+client.subscribe('kn/powerUsage');
 
 // publish message 'Hello' to topic 'my/test/topic'
 //client.publish('my/test/topic', 'Hello');

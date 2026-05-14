@@ -3,14 +3,13 @@ import jwt from "jsonwebtoken";
 
 
 export const logIn = (req: Request, res: Response)=>{
-console.log('yolo?');
+
     const expireTime = 2 //in hours
 
     const expiresIn: `${number}h` = `${expireTime}h`;
 
 try{
      const jwtKey = process.env.JWT_KEY;
-     console.log(jwtKey);
     const pass=process.env.APP_PASS;
     const un=process.env.APP_USERNAME;
 
