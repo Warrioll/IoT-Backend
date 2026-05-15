@@ -24,6 +24,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     optionsSuccessStatus: 200 
 }));
+
 app.use(cookieParser())
 app.use(express.json());
 
@@ -43,7 +44,10 @@ app.use((req, res, next) => {
 
   next()
 })
- 
+
+app.disable("etag")
+app.set("trust proxy", 1)
+
 
 
 const connectToDatabase = async () =>{
