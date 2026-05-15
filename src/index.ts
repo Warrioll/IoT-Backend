@@ -27,6 +27,22 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json());
 
+app.use((req, res, next) => {
+  const start = Date.now()
+
+  console.log('START', req.method, req.url)
+
+  res.on('finish', () => {
+    console.log(
+      'END',
+      req.method,
+      req.url,
+      Date.now() - start + 'ms'
+    )
+  })
+
+  next()
+})
  
 
 
